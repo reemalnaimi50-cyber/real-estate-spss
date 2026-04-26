@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 
-st.title("Real Estate Price Prediction")
+st.title("Real Estate Price Prediction (SPSS Final Correct Model)")
 
 # 🌍 Cities
 city_geo = {
@@ -12,7 +12,7 @@ city_geo = {
     "الجبيل":   {"lat": 27.0046, "lng": 49.6460, "city_id": 5}
 }
 
-# 🧭 Direction
+# 🧭 اتجاه الشارع (فقط 3 نماذج تستخدمه)
 direction_map = {
     "شمالي": 1.0,
     "جنوبي": 0.9,
@@ -38,20 +38,17 @@ city_id = city_geo[city]["city_id"]
 area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
 
-distance_to_sea = st.number_input("Distance to Sea", 0.0)
+# 🚫 لا يوجد إدخال للمسافة أو عرض الشارع نهائياً
 
+# 🧭 الاتجاه (يستخدم فقط في 3 نماذج)
 direction = st.selectbox("Street Direction", ["شمالي", "جنوبي", "شرقي", "غربي"])
 street_direction = direction_map[direction]
 
 # ================= LAND SALE =================
 if property_type == "Land Sale":
 
-    street_width = st.number_input("Street Width", 0.0)
-
     price_log = (-190.854 +
-                 0.882 * area_log -
-                 0.030 * distance_to_sea +
-                 0.010 * street_width +
+                 0.882 * area_log +
                  3.024 * lng +
                  1.809 * lat +
                  0.014 * street_direction)
@@ -71,7 +68,6 @@ elif property_type == "House Sale":
 
     price_log = (-125.153 +
                  0.814 * area_log -
-                 0.007 * distance_to_sea -
                  0.015 * age +
                  1.280 * lat +
                  2.013 * lng +
@@ -90,12 +86,10 @@ elif property_type == "Apartment Sale":
     livings = st.number_input("Livings", 0)
     wc = st.number_input("WC", 0)
     beds = st.number_input("Beds", 0)
-    street_width = st.number_input("Street Width", 0.0)
 
     price_log = (10.738 +
                  0.473 * area_log +
-                 0.042 * wc -
-                 0.003 * street_width +
+                 0.042 * wc +
                  0.051 * livings -
                  0.007 * age -
                  0.006 * beds)
@@ -105,12 +99,8 @@ elif property_type == "Apartment Sale":
 # ================= LAND RENT =================
 elif property_type == "Land Rent":
 
-    street_width = st.number_input("Street Width", 0.0)
-
     price_log = (7.132 +
-                 0.651 * area_log -
-                 0.081 * distance_to_sea +
-                 0.011 * street_width +
+                 0.651 * area_log +
                  0.071 * street_direction +
                  0.044 * city_id)
 
@@ -126,8 +116,7 @@ elif property_type == "House Rent":
 
     price_log = (8.080 +
                  0.512 * area_log +
-                 0.338 * f -
-                 0.023 * distance_to_sea +
+                 0.338 * f +
                  0.078 * livings)
 
     price = np.exp(price_log)
