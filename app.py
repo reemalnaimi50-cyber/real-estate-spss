@@ -1,9 +1,9 @@
 import streamlit as st
 import numpy as np
 
-st.title("Real Estate Price Prediction (Clean SPSS Model)")
+st.title("Real Estate Price Prediction (SPSS Model)")
 
-# 🌍 المدن
+# المدن
 city_geo = {
     "الدمام":   {"lat": 26.3927, "lng": 49.9777, "city_id": 1},
     "الخبر":    {"lat": 26.2172, "lng": 50.1971, "city_id": 2},
@@ -12,56 +12,38 @@ city_geo = {
     "الجبيل":   {"lat": 27.0046, "lng": 49.6460, "city_id": 5}
 }
 
-# 🏠 نوع العقار
+# الاتجاه
+direction_map = {
+    "شمالي": 1.0,
+    "جنوبي": 0.9,
+    "شرقي": 0.8,
+    "غربي": 0.7
+}
+
 property_type = st.selectbox("Property Type", [
     "Land Sale",
     "House Sale",
-    "Apartment Sale",
-    "Land Rent",
-    "House Rent",
-    "Apartment Rent"
+    "Land Rent"
 ])
 
-# 🌍 المدينة
 city = st.selectbox("City", list(city_geo.keys()))
 
 lat = city_geo[city]["lat"]
 lng = city_geo[city]["lng"]
 city_id = city_geo[city]["city_id"]
 
-# 📊 المدخلات الأساسية فقط
-area = st.number_input("Area (sqm)", min_value=1.0)
+area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
 
-# 🌊 قيمة ثابتة (بديل distance_to_sea)
-distance_to_sea = {
-    "الدمام": 2,
-    "الخبر": 1,
-    "الظهران": 3,
-    "القطيف": 1.5,
-    "الجبيل": 5
-}[city]
+distance_to_sea = st.number_input("Distance to Sea", 0.0)
 
-# 🛣️ قيم ثابتة (بديل street width)
-street_width = {
-    "الدمام": 20,
-    "الخبر": 18,
-    "الظهران": 25,
-    "القطيف": 12,
-    "الجبيل": 15
-}[city]
-
-# 🧭 قيمة ثابتة (بديل street direction)
-street_direction = {
-    "الدمام": 1,
-    "الخبر": 1,
-    "الظهران": 0.8,
-    "القطيف": 0.9,
-    "الجبيل": 0.7
-}[city]
+direction = st.selectbox("Street Direction", ["شمالي", "جنوبي", "شرقي", "غربي"])
+street_direction = direction_map[direction]
 
 # ================= LAND SALE =================
 if property_type == "Land Sale":
+
+    street_width = st.number_input("Street Width", 0.0)
 
     price_log = (-190.854 +
                  0.882 * area_log -
@@ -78,8 +60,8 @@ elif property_type == "House Sale":
 
     age = st.number_input("Age", 0)
     furnished = st.selectbox("Furnished", ["No", "Yes"])
-    livings = st.number_input("Living Rooms", 0)
-    wc = st.number_input("Bathrooms", 0)
+    livings = st.number_input("Livings", 0)
+    wc = st.number_input("WC", 0)
     beds = st.number_input("Beds", 0)
 
     f = 1 if furnished == "Yes" else 0
@@ -91,32 +73,17 @@ elif property_type == "House Sale":
                  1.280 * lat +
                  2.013 * lng +
                  0.176 * f +
+                 0.010 * street_direction +
                  0.018 * livings +
                  0.013 * wc +
                  0.006 * beds)
 
     price = np.exp(price_log)
 
-# ================= APARTMENT SALE =================
-elif property_type == "Apartment Sale":
-
-    age = st.number_input("Age", 0)
-    livings = st.number_input("Living Rooms", 0)
-    wc = st.number_input("Bathrooms", 0)
-    beds = st.number_input("Beds", 0)
-
-    price_log = (10.738 +
-                 0.473 * area_log +
-                 0.042 * wc -
-                 0.003 * street_width +
-                 0.051 * livings -
-                 0.007 * age -
-                 0.006 * beds)
-
-    price = np.exp(price_log)
-
 # ================= LAND RENT =================
 elif property_type == "Land Rent":
+
+    street_width = st.number_input("Street Width", 0.0)
 
     price_log = (7.132 +
                  0.651 * area_log -
@@ -127,44 +94,6 @@ elif property_type == "Land Rent":
 
     price = np.exp(price_log)
 
-# ================= HOUSE RENT =================
-elif property_type == "House Rent":
-
-    furnished = st.selectbox("Furnished", ["No", "Yes"])
-    livings = st.number_input("Living Rooms", 0)
-
-    f = 1 if furnished == "Yes" else 0
-
-    price_log = (8.080 +
-                 0.512 * area_log +
-                 0.338 * f -
-                 0.023 * distance_to_sea +
-                 0.078 * livings)
-
-    price = np.exp(price_log)
-
-# ================= APARTMENT RENT =================
-elif property_type == "Apartment Rent":
-
-    rent_period = st.number_input("Rent Period", 1)
-    wc = st.number_input("Bathrooms", 0)
-    furnished = st.selectbox("Furnished", ["No", "Yes"])
-    beds = st.number_input("Beds", 0)
-    livings = st.number_input("Living Rooms", 0)
-    kitchen = st.number_input("Kitchen", 0)
-
-    f = 1 if furnished == "Yes" else 0
-
-    price_log = (3.429 +
-                 1.796 * rent_period +
-                 0.360 * wc +
-                 0.274 * f +
-                 0.111 * beds +
-                 0.183 * livings -
-                 0.246 * kitchen)
-
-    price = np.exp(price_log)
-
-# 🚀 OUTPUT
+# OUTPUT
 if st.button("Predict Price"):
-    st.success(f"Predicted Price: {price:,.2f} SAR")
+    st.success(f"Price: {price:,.2f} SAR")
