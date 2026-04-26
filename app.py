@@ -12,7 +12,7 @@ city_geo = {
     "الجبيل":   {"lat": 27.0046, "lng": 49.6460, "city_id": 5}
 }
 
-# 🧭 اتجاه الشارع
+# 🧭 اتجاه الشارع (فقط 3 نماذج تستخدمه)
 direction_map = {
     "شمالي": 1.0,
     "جنوبي": 0.9,
@@ -38,6 +38,9 @@ city_id = city_geo[city]["city_id"]
 area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
 
+# 🚫 لا يوجد إدخال للمسافة أو عرض الشارع نهائياً
+
+# 🧭 الاتجاه (يستخدم فقط في 3 نماذج)
 direction = st.selectbox("Street Direction", ["شمالي", "جنوبي", "شرقي", "غربي"])
 street_direction = direction_map[direction]
 
@@ -96,23 +99,15 @@ elif property_type == "Apartment Sale":
 # ================= LAND RENT =================
 elif property_type == "Land Rent":
 
-    # 📌 FIXED ASSUMPTION
-    rent_period = 12
-    st.info("📌 مدة الإيجار للأراضي: 12 شهر (عقد سنوي)")
-
     price_log = (7.132 +
                  0.651 * area_log +
                  0.071 * street_direction +
                  0.044 * city_id)
 
-    price = np.exp(price_log) * 12  # 🔥 scaling
+    price = np.exp(price_log)
 
 # ================= HOUSE RENT =================
 elif property_type == "House Rent":
-
-    # 📌 FIXED ASSUMPTION
-    rent_period = 12
-    st.info("📌 مدة الإيجار للبيوت: 6–12 شهر (تم افتراض 12 شهر)")
 
     furnished = st.selectbox("Furnished", ["No", "Yes"])
     livings = st.number_input("Livings", 0)
@@ -124,15 +119,12 @@ elif property_type == "House Rent":
                  0.338 * f +
                  0.078 * livings)
 
-    price = np.exp(price_log) * 12  # 🔥 scaling
+    price = np.exp(price_log)
 
 # ================= APARTMENT RENT =================
 elif property_type == "Apartment Rent":
 
-    # 📌 FIXED ASSUMPTION
-    rent_period = 6
-    st.info("📌 مدة الإيجار للشقق: 3–6 أشهر (تم افتراض 6 أشهر)")
-
+    rent_period = st.number_input("Rent Period", 1)
     wc = st.number_input("WC", 0)
     furnished = st.selectbox("Furnished", ["No", "Yes"])
     beds = st.number_input("Beds", 0)
@@ -149,7 +141,7 @@ elif property_type == "Apartment Rent":
                  0.183 * livings -
                  0.246 * kitchen)
 
-    price = np.exp(price_log) * 6  # 🔥 scaling
+    price = np.exp(price_log)
 
 # 🚀 OUTPUT
 if st.button("Predict Price"):
