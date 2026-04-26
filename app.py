@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 
-st.title("Real Estate Price Prediction (SPSS Final Correct Model)")
+st.title("Real Estate Price Prediction")
 
 # 🌍 Cities
 city_geo = {
@@ -98,23 +98,21 @@ elif property_type == "Land Rent":
 
     # 📌 FIXED ASSUMPTION
     rent_period = 12
-
-    st.info("مدة الإيجار الافتراضية للأراضي: 12 شهر (عقد سنوي)")
+    st.info("📌 مدة الإيجار للأراضي: 12 شهر (عقد سنوي)")
 
     price_log = (7.132 +
                  0.651 * area_log +
                  0.071 * street_direction +
                  0.044 * city_id)
 
-    price = np.exp(price_log)
+    price = np.exp(price_log) * 12  # 🔥 scaling
 
 # ================= HOUSE RENT =================
 elif property_type == "House Rent":
 
     # 📌 FIXED ASSUMPTION
     rent_period = 12
-
-    st.info("مدة الإيجار الافتراضية للبيوت: 6–12 شهر (تم افتراض 12 شهر)")
+    st.info("📌 مدة الإيجار للبيوت: 6–12 شهر (تم افتراض 12 شهر)")
 
     furnished = st.selectbox("Furnished", ["No", "Yes"])
     livings = st.number_input("Livings", 0)
@@ -126,15 +124,14 @@ elif property_type == "House Rent":
                  0.338 * f +
                  0.078 * livings)
 
-    price = np.exp(price_log)
+    price = np.exp(price_log) * 12  # 🔥 scaling
 
 # ================= APARTMENT RENT =================
 elif property_type == "Apartment Rent":
 
     # 📌 FIXED ASSUMPTION
     rent_period = 6
-
-    st.info("مدة الإيجار الافتراضية للشقق: 3–6 أشهر (تم افتراض 6 أشهر)")
+    st.info("📌 مدة الإيجار للشقق: 3–6 أشهر (تم افتراض 6 أشهر)")
 
     wc = st.number_input("WC", 0)
     furnished = st.selectbox("Furnished", ["No", "Yes"])
@@ -152,7 +149,7 @@ elif property_type == "Apartment Rent":
                  0.183 * livings -
                  0.246 * kitchen)
 
-    price = np.exp(price_log)
+    price = np.exp(price_log) * 6  # 🔥 scaling
 
 # 🚀 OUTPUT
 if st.button("Predict Price"):
