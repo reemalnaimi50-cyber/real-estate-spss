@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 
-st.title("Real Estate Price Prediction (SPSS Model)")
+st.title("Real Estate Price Prediction (Clean SPSS Model)")
 
 # المدن
 city_geo = {
@@ -12,7 +12,7 @@ city_geo = {
     "الجبيل":   {"lat": 27.0046, "lng": 49.6460, "city_id": 5}
 }
 
-# الاتجاه
+# اتجاه الشارع (اختيار فقط)
 direction_map = {
     "شمالي": 1.0,
     "جنوبي": 0.9,
@@ -35,15 +35,29 @@ city_id = city_geo[city]["city_id"]
 area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
 
-distance_to_sea = st.number_input("Distance to Sea", 0.0)
+# ❌ العميل لا يدخل أي شيء عن البحر أو الشارع
+distance_to_sea = {
+    "الدمام": 2,
+    "الخبر": 1,
+    "الظهران": 3,
+    "القطيف": 1.5,
+    "الجبيل": 5
+}[city]
 
-direction = st.selectbox("Street Direction", ["شمالي", "جنوبي", "شرقي", "غربي"])
-street_direction = direction_map[direction]
+street_width = {
+    "الدمام": 20,
+    "الخبر": 18,
+    "الظهران": 25,
+    "القطيف": 12,
+    "الجبيل": 15
+}[city]
+
+street_direction = direction_map[
+    st.selectbox("Street Direction", ["شمالي", "جنوبي", "شرقي", "غربي"])
+]
 
 # ================= LAND SALE =================
 if property_type == "Land Sale":
-
-    street_width = st.number_input("Street Width", 0.0)
 
     price_log = (-190.854 +
                  0.882 * area_log -
@@ -73,7 +87,6 @@ elif property_type == "House Sale":
                  1.280 * lat +
                  2.013 * lng +
                  0.176 * f +
-                 0.010 * street_direction +
                  0.018 * livings +
                  0.013 * wc +
                  0.006 * beds)
@@ -82,8 +95,6 @@ elif property_type == "House Sale":
 
 # ================= LAND RENT =================
 elif property_type == "Land Rent":
-
-    street_width = st.number_input("Street Width", 0.0)
 
     price_log = (7.132 +
                  0.651 * area_log -
