@@ -1,7 +1,8 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 
-# 🏫 الشعار (تكبير مضمون)
+# 🏫 شعار الجامعة (تكبير)
 st.image("IMG_9045.png", use_container_width=True)
 
 st.title("Real Estate Price Prediction")
@@ -37,6 +38,15 @@ city = st.selectbox("City", list(city_geo.keys()))
 lat = city_geo[city]["lat"]
 lng = city_geo[city]["lng"]
 city_id = city_geo[city]["city_id"]
+
+# 🗺️ الخريطة (تعديل مهم لضمان الظهور)
+map_data = pd.DataFrame({
+    "lat": [lat],
+    "lon": [lng]
+})
+
+st.subheader("Location Map")
+st.map(map_data, use_container_width=True)
 
 area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
