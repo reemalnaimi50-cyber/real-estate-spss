@@ -6,7 +6,7 @@ import pandas as pd
 col1, col2 = st.columns([1, 5])
 
 with col1:
-    st.image("IMG_9045.png", width=180)
+    st.image("IMG_9045.png", width=300)
 
 with col2:
     st.title("Real Estate Price Prediction")
