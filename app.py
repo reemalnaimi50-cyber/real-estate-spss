@@ -2,10 +2,14 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# 🏫 صورة الشعار (فوق العنوان)
-st.image("IMG_9045.png", width=120)
+# 🏫 الشعار + العنوان بشكل احترافي
+col1, col2 = st.columns([1, 5])
 
-st.title("Real Estate Price Prediction")
+with col1:
+    st.image("IMG_9045.png", width=180)
+
+with col2:
+    st.title("Real Estate Price Prediction")
 
 # 🌍 Cities
 city_geo = {
