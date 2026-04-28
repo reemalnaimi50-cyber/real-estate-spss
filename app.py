@@ -1,15 +1,10 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
 
-# 🏫 الشعار + العنوان بشكل احترافي
-col1, col2 = st.columns([1, 5])
+# 🏫 الشعار (تكبير مضمون)
+st.image("IMG_9045.png", use_container_width=True)
 
-with col1:
-    st.image("IMG_9045.png", width=300)
-
-with col2:
-    st.title("Real Estate Price Prediction")
+st.title("Real Estate Price Prediction")
 
 # 🌍 Cities
 city_geo = {
@@ -42,14 +37,6 @@ city = st.selectbox("City", list(city_geo.keys()))
 lat = city_geo[city]["lat"]
 lng = city_geo[city]["lng"]
 city_id = city_geo[city]["city_id"]
-
-# 🗺️ خريطة حسب المدينة المختارة
-map_data = pd.DataFrame({
-    "lat": [lat],
-    "lon": [lng]
-})
-
-st.map(map_data)
 
 area = st.number_input("Area", min_value=1.0)
 area_log = np.log(area)
